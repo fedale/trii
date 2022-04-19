@@ -37,7 +37,7 @@ use app\widgets\FancyTreeWidget\ContextMenuWidget;
                 const permissions = data.node.getParentList()[0]["data"]["data-permissions"];
 
                 function updateItemInfo(data) {
-                    console.log(data);
+                    // console.log(data);
                     data["filename"] ? $("#filename").html(data["filename"]) : $("#filename").html("");
                     data["basename"] ? $("#basename").html(data["basename"]) : $("#basename").html("");
                     data["dirname"] ? $("#dirname").html(data["dirname"]) : $("#dirname").html("");
@@ -65,7 +65,7 @@ use app\widgets\FancyTreeWidget\ContextMenuWidget;
                     data: {path : path, filename: filename, folder: folder},
                     dataType : "json",
                     success:function(result){
-                        console.log(result);
+                        // console.log(result);
                         updateItemInfo(result);
                     }
                  }
@@ -103,8 +103,6 @@ use app\widgets\FancyTreeWidget\ContextMenuWidget;
 
                     // Drop from another node
                     if (data.otherNode) {
-                        console.log("data.OtherNode");
-                        
                         const from = data.otherNode.data["data-path"];
                         const filename = data.otherNode.data["data-name"];
                         const folder = data.otherNode.folder || false;
@@ -118,6 +116,7 @@ use app\widgets\FancyTreeWidget\ContextMenuWidget;
                             data: {from : from, to: to, filename: filename, folder: folder, action: "move"},
                             dataType : "json",
                             success:function(result){
+                                data.node.data["data-path"] = to;
                                 console.log("success");
                                 console.log(result);                            
                             }
@@ -127,12 +126,13 @@ use app\widgets\FancyTreeWidget\ContextMenuWidget;
                         // Drop files
                         for(var i=0; i < data.files.length; i++) {
                             var file = data.files[i];
+                            console.log(file);
                             node.addNode( { title: file.name }, data.hitMode );
 
                             let formData = new FormData();
                             formData.append("file", transfer.files[i]);
                             formData.append("destination", node.data["data-path"]);
-                            //console.log(node.data["data-path"]);//.getParentList()[0]);
+                            console.log(node.data["data-path"]);//.getParentList()[0]);
 
                             $.ajax({
                                 url: "/tree/upload",
@@ -141,8 +141,6 @@ use app\widgets\FancyTreeWidget\ContextMenuWidget;
                                 cache: false,
                                 contentType: false,
                                 processData: false,
-                                //data: {from : from, to: to, filename: filename, folder: folder, action: "move"},
-                                //dataType : "json",
                                 success: function(result){
                                     console.log("success");
                                     console.log(result);                            
@@ -171,12 +169,13 @@ use app\widgets\FancyTreeWidget\ContextMenuWidget;
         'edit' => [
             'triggerstart' => ['f2', 'shift+click', 'mac+enter'],
             'close' => new JsExpression('function(event, data) {
-                console.log(data);
+                // console.log(data);
                 const path = data.node.data["data-path"];
                 const previousFilename = data.orgTitle;
                 const filename = data.node.title;
                 const folder = data.node.folder || false;
-                console.log(path, "previous: " + previousFilename, "filename: " + filename, folder);
+                console.log(data);
+                ///console.log(path, "previous: " + previousFilename, "filename: " + filename, folder);
 
                 $.ajax({
                     url: "/tree/rename",
@@ -184,8 +183,9 @@ use app\widgets\FancyTreeWidget\ContextMenuWidget;
                     data: {path : path, previousFilename: previousFilename, filename: filename, folder: folder},
                     dataType : "json",
                     success:function(result){
-                        console.log(result);
-                        updateItemInfo(result);
+                        $("#filename").html(filename);
+                        $("#basename").html(filename);
+                        data.node.data["data-name"] = filename;
                     }
                  });
             }'),

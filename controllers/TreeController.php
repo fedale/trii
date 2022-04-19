@@ -19,10 +19,26 @@ use yii\web\UploadedFile;
 
 class TreeController extends Controller
 {
+
+    /**
+     * Displays homepage.
+     *
+     * @return string
+     */
+    public function actionIndex()
+    {
+        return $this->render('index');
+    }
+
+
     /*
      * Render the FancyTree
      */
     public function actionView() {
+        if (Yii::$app->request->isAjax) {
+            return $this->renderAjax('view', [
+            ]);    
+        }
         return $this->render('view', [
         ]);
     }
@@ -38,16 +54,21 @@ class TreeController extends Controller
         }
 
         $post = Yii::$app->getRequest()->post();
+        $post['folder'] = filter_var($post['folder'], FILTER_VALIDATE_BOOLEAN);
         Yii::$app->response->format = Response::FORMAT_JSON;
+
+        if ($post['folder']) {
+            return false;
+        }
 
         [ 
             'basename' => $basename, 
             'dirname' => $dirname, 
             'extension' => $extension, 
             'filename' => $filename
-        ]  = \pathinfo($post['path']);
+        ]  = \pathinfo($post['path'] . '/' . $post['filename']);
 
-        $stat = \stat($post['path']);
+        $stat = \stat($post['path'] . '/' . $post['filename']);
         $mime = \finfo_file(\finfo_open(FILEINFO_MIME_TYPE), $post['path']);
         $encoding = \finfo_file(\finfo_open(FILEINFO_MIME_ENCODING), $post['path']);
         $size = $stat[7];
@@ -83,6 +104,7 @@ class TreeController extends Controller
 
         $post = Yii::$app->getRequest()->post();
         $post['folder'] = filter_var($post['folder'], FILTER_VALIDATE_BOOLEAN);
+        Yii::$app->response->format = Response::FORMAT_JSON;
         
         if ( $post['folder']) { // It is a folder
             $newDirectory = str_replace('/' . $post['previousFilename'], '/' . $post['filename'], $post['path']);
@@ -90,6 +112,8 @@ class TreeController extends Controller
         } else {
             \rename($post['path']  . '/' . $post['previousFilename'], $post['path'] . '/' . $post['filename']);
         }
+
+        return "OK";
     }
 
     /*
@@ -110,10 +134,8 @@ class TreeController extends Controller
                 FileHelper::copyDirectory($post['from'], $post['to'] . '/' . $post['filename']);
                 FileHelper::removeDirectory($post['from']);
             } else {
-                var_dump($post['from'] . '/' . $post['filename']);
-                var_dump($post['to'] . '/' . $post['filename']);
                 copy($post['from'] . '/' . $post['filename'], $post['to'] . '/' . $post['filename']);
-            //    unlink($post['from'] . '/' . $post['filename']);
+                unlink($post['from'] . '/' . $post['filename']);
             }
         }
 

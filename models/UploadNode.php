@@ -15,7 +15,7 @@ class UploadNode extends Model
     public function rules()
     {
         return [
-            [['file'], 'file', 'skipOnEmpty' => false, 'extensions' => 'png, jpg, pdf'],
+            [['file'], 'file', 'skipOnEmpty' => false, 'extensions' => 'png, jpg, pdf, txt'],
         ];
     }
 
@@ -27,12 +27,10 @@ class UploadNode extends Model
         }
 
         if ($this->validate()) {
-            var_dump($destination . '/' . $this->file->baseName . '.' . $this->file->extension);
+            // var_dump($destination . '/' . $this->file->baseName . '.' . $this->file->extension);
             $this->file->saveAs($destination . '/' . $this->file->baseName . '.' . $this->file->extension);
             return true;
         } else {
-            var_dump("do not validates");
-            var_dump($this->getErrors());
             return false;
         }
     }

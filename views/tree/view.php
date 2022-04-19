@@ -177,10 +177,11 @@ use app\widgets\FancyTreeWidget\ContextMenuWidget;
                 const filename = data.node.title;
                 const folder = data.node.folder || false;
                 console.log(path, "previous: " + previousFilename, "filename: " + filename, folder);
+
                 $.ajax({
                     url: "/tree/rename",
                     type: "POST",
-                    data: {path : path, filename: filename, folder: folder},
+                    data: {path : path, previousFilename: previousFilename, filename: filename, folder: folder},
                     dataType : "json",
                     success:function(result){
                         console.log(result);
@@ -277,7 +278,7 @@ use app\widgets\FancyTreeWidget\ContextMenuWidget;
                         const folder = node.folder || false;
                         
                         $.ajax({
-                            url: "/site/download",
+                            url: "/tree/download",
                             type: "POST",
                             data: {name: name, path: path, folder: folder, action: "download"},
                             dataType : "json",

@@ -47,7 +47,7 @@ class FancyTreeWidget extends Widget
             if (is_array($paths)) {
                 $this->options['source'] = $this->getTree($paths);
             } else {
-                throw new \yii\base\InvalidParamException('Paths option must be an array.');
+                throw new \yii\base\InvalidArgumentException('Paths option must be an array.');
             }
             
         } 
@@ -80,26 +80,24 @@ class FancyTreeWidget extends Widget
         $tree = [];
         $directories = \scandir($path);
 
-        foreach ( $directories as $k => $directory ) {
-            if ($directory != '.' && $directory != '..') {
-                $p = $path . '/' . $directory;
+        foreach ( $directories as $k => $item ) {
+            if ($item != '.' && $item != '..') {
+                $p = $path . '/' . $item;
                 if (\is_dir($p)) {
                     
                     $tree[] = array(
-                        'title' => $directory,
+                        'title' => $item,
                         'folder' => true,
                         'expanded' => true,
-                        'data-path' => $p,
-                        'data-name' => $directory,
-                   //     'data-permissions' => $permissions,
+                        'data-path' => $p, // item is a dir, we need it in path
+                        'data-name' => $item,
                         'children' => $this->getTreeFromPath($p)
                     );
                 } else {
                     $tree[] = array(
-                        'title' => $directory,
-                        'data-path' => $p,
-                    //    'data-permissions' => $permissions,
-                        'data-name' => $directory,
+                        'title' => $item,
+                        'data-path' => $path,
+                        'data-name' => $item,
                     );
                 }
             }

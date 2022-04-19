@@ -34,7 +34,7 @@ class TreeController extends Controller
      */
     public function actionRead() {
         if (!Yii::$app->request->isAjax) {
-            throw new \yii\web\BadRequestHttpException('Messsage');
+            throw new \yii\web\BadRequestHttpException();
         }
 
         $post = Yii::$app->getRequest()->post();
@@ -78,13 +78,18 @@ class TreeController extends Controller
      */
     public function actionRename() {
         if (!Yii::$app->request->isAjax) {
-            throw new \yii\web\BadRequestHttpException('Messsage');
+            throw new \yii\web\BadRequestHttpException();
         }
 
         $post = Yii::$app->getRequest()->post();
         $post['folder'] = filter_var($post['folder'], FILTER_VALIDATE_BOOLEAN);
         
-        // To implement
+        if ( $post['folder']) { // It is a folder
+            $newDirectory = str_replace('/' . $post['previousFilename'], '/' . $post['filename'], $post['path']);
+            \rename($post['path'], $newDirectory);   
+        } else {
+            \rename($post['path']  . '/' . $post['previousFilename'], $post['path'] . '/' . $post['filename']);
+        }
     }
 
     /*
@@ -92,7 +97,7 @@ class TreeController extends Controller
      */
     public function actionMove() {
         if (!Yii::$app->request->isAjax) {
-            throw new \yii\web\BadRequestHttpException('Messsage');
+            throw new \yii\web\BadRequestHttpException();
         }
 
         $post = Yii::$app->getRequest()->post();
@@ -105,8 +110,10 @@ class TreeController extends Controller
                 FileHelper::copyDirectory($post['from'], $post['to'] . '/' . $post['filename']);
                 FileHelper::removeDirectory($post['from']);
             } else {
-                copy($post['from'], $post['to'] . '/' . $post['filename']);
-                unlink($post['from']);
+                var_dump($post['from'] . '/' . $post['filename']);
+                var_dump($post['to'] . '/' . $post['filename']);
+                copy($post['from'] . '/' . $post['filename'], $post['to'] . '/' . $post['filename']);
+            //    unlink($post['from'] . '/' . $post['filename']);
             }
         }
 
@@ -134,7 +141,11 @@ class TreeController extends Controller
      */
     public function actionDownload() {
         $post = Yii::$app->getRequest()->post();
-        return $this->redirect(['/site/downloadItem', 'path' => $post['path'], 'name' => $post['name']]);
+        if ($post['folder']) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return false;
+        }
+        return $this->redirect(['/tree/download-item', 'path' => $post['path'], 'name' => $post['name']]);
     }
 
     /*
@@ -143,7 +154,7 @@ class TreeController extends Controller
     public function actionDownloadItem($path, $name) {
         $response = Yii::$app->getResponse();
         $response->format = yii\web\Response::FORMAT_RAW;
-        return $response->sendFile($path, $name, ['inline' => false])->send();
+        return $response->sendFile($path . '/' . $name, $name, ['inline' => false])->send();
     }
 
     
@@ -158,7 +169,7 @@ class TreeController extends Controller
         if ( $post['folder']) { // It is a folder
             \rmdir( $post['path']);
         } else {
-            \unlink($post['path']);
+            \unlink($post['path'] . '/' . $post['name']);
         }
 
         return [

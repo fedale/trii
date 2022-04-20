@@ -109,16 +109,22 @@ use app\widgets\FancyTreeWidget\ContextMenuWidget;
                         const to = node.data["data-path"];
                         
                         data.otherNode.moveTo(node, data.hitMode);
-                       
+                       console.log(from, to, filename);
                         $.ajax({
                             url: "/tree/move",
                             type: "POST",
                             data: {from : from, to: to, filename: filename, folder: folder, action: "move"},
                             dataType : "json",
                             success:function(result){
-                                data.node.data["data-path"] = to;
                                 console.log("success");
-                                console.log(result);                            
+                                console.log(node);
+                                data.otherNode.data["data-path"] = to;
+                                // node.data["data-path"] = to;
+                                // node.data["data-name"] = filename;
+                                // node.render(true);
+                                // console.log(data);
+                                
+                                // console.log(result);                            
                             }
                         });
 
@@ -146,16 +152,6 @@ use app\widgets\FancyTreeWidget\ContextMenuWidget;
                                     console.log(result);                            
                                 }
                             });
-
-                            // var url = "https://example.com/upload",
-                            //     formData = new FormData();
-
-                            // formData.append("file", transfer.files[0])
-                            // fetch(url, {
-                            //   method: "POST",
-                            //   body: formData
-                            // }).then(function() { /* Done. Inform the user */ })
-                            // .catch(function() { /* Error. Inform the user */ });
                         }
                     } else {
                         console.log("// Drop a non-node");
@@ -169,13 +165,11 @@ use app\widgets\FancyTreeWidget\ContextMenuWidget;
         'edit' => [
             'triggerstart' => ['f2', 'shift+click', 'mac+enter'],
             'close' => new JsExpression('function(event, data) {
-                // console.log(data);
                 const path = data.node.data["data-path"];
                 const previousFilename = data.orgTitle;
                 const filename = data.node.title;
                 const folder = data.node.folder || false;
                 console.log(data);
-                ///console.log(path, "previous: " + previousFilename, "filename: " + filename, folder);
 
                 $.ajax({
                     url: "/tree/rename",

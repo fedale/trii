@@ -126,7 +126,8 @@ class TreeController extends Controller
 
         $post = Yii::$app->getRequest()->post();
         $post['folder'] = filter_var($post['folder'], FILTER_VALIDATE_BOOLEAN);
-        
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
         switch( $action = $post['action'] ) {
             case "move":
             default:
@@ -163,6 +164,8 @@ class TreeController extends Controller
      */
     public function actionDownload() {
         $post = Yii::$app->getRequest()->post();
+        $post['folder'] = filter_var($post['folder'], FILTER_VALIDATE_BOOLEAN);
+        
         if ($post['folder']) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return false;

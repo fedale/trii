@@ -35,7 +35,7 @@ use app\widgets\FancyTreeWidget\ContextMenuWidget;
                 const filename = data.node.data["data-name"];
                 const folder = data.node.folder || false;
                 const permissions = data.node.getParentList()[0]["data"]["data-permissions"];
-
+console.log(data);
                 function updateItemInfo(data) {
                     // console.log(data);
                     data["filename"] ? $("#filename").html(data["filename"]) : $("#filename").html("");
@@ -116,15 +116,7 @@ use app\widgets\FancyTreeWidget\ContextMenuWidget;
                             data: {from : from, to: to, filename: filename, folder: folder, action: "move"},
                             dataType : "json",
                             success:function(result){
-                                console.log("success");
-                                console.log(node);
                                 data.otherNode.data["data-path"] = to;
-                                // node.data["data-path"] = to;
-                                // node.data["data-name"] = filename;
-                                // node.render(true);
-                                // console.log(data);
-                                
-                                // console.log(result);                            
                             }
                         });
 
@@ -132,13 +124,14 @@ use app\widgets\FancyTreeWidget\ContextMenuWidget;
                         // Drop files
                         for(var i=0; i < data.files.length; i++) {
                             var file = data.files[i];
-                            console.log(file);
-                            node.addNode( { title: file.name }, data.hitMode );
+                            node.addNode( { title: file.name, folder: false, data: {"data-name": file.name, "data-path": node.data["data-path"]} }, data.hitMode );
 
                             let formData = new FormData();
                             formData.append("file", transfer.files[i]);
                             formData.append("destination", node.data["data-path"]);
-                            console.log(node.data["data-path"]);//.getParentList()[0]);
+                            //formData.append("folder", "false");
+                            //formData.appen
+                            console.log(node);//.getParentList()[0]);
 
                             $.ajax({
                                 url: "/tree/upload",
@@ -148,6 +141,7 @@ use app\widgets\FancyTreeWidget\ContextMenuWidget;
                                 contentType: false,
                                 processData: false,
                                 success: function(result){
+                                    //node.tree.reload();
                                     console.log("success");
                                     console.log(result);                            
                                 }
@@ -245,7 +239,7 @@ use app\widgets\FancyTreeWidget\ContextMenuWidget;
                                 success: function(data) {
                                     if (data.status === "ok") {
                                         node.remove();
-                                        $.ui.fancytree.load(true);
+                                        //$.ui.fancytree.load(true);
                                     }
                                 }
                             });

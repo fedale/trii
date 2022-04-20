@@ -49,14 +49,15 @@ class TreeController extends Controller
      * Callable only via AJAX
      */
     public function actionRead() {
-        if (!Yii::$app->request->isAjax) {
+/*        if (!Yii::$app->request->isAjax) {
             throw new \yii\web\BadRequestHttpException();
-        }
+    }
+ */
 
         $post = Yii::$app->getRequest()->post();
         $post['folder'] = filter_var($post['folder'], FILTER_VALIDATE_BOOLEAN);
         Yii::$app->response->format = Response::FORMAT_JSON;
-
+//var_dump($post);
         if ($post['folder']) {
             return false;
         }

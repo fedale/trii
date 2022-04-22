@@ -1,6 +1,6 @@
 <?php
 
-namespace app\widgets\FancyTreeWidget;
+namespace app\components\widgets\FancyTreeWidget;
 
 use Yii;
 use yii\base\Widget;

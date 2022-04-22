@@ -1,5 +1,5 @@
 <?php 
-namespace app\widgets\FancyTree;
+namespace app\components\widgets\FancyTreeWidget;
 
 use yii\web\Controller;
 
